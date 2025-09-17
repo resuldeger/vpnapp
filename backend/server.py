@@ -69,6 +69,9 @@ class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
+class PasswordResetRequest(BaseModel):
+    email: EmailStr
+
 class ProxyServer(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
