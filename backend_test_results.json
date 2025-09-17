@@ -1,0 +1,131 @@
+{
+  "total": 12,
+  "passed": 12,
+  "failed": 0,
+  "success_rate": 100.0,
+  "details": [
+    {
+      "test": "Health Check",
+      "success": true,
+      "details": "Backend is healthy",
+      "timestamp": "2025-09-17T20:01:05.039566",
+      "response_data": {
+        "status": "healthy",
+        "timestamp": "2025-09-17T20:01:05.036211"
+      }
+    },
+    {
+      "test": "User Registration",
+      "success": true,
+      "details": "User registered successfully with ID: a920ab0a-0bd1-4f6d-8579-e36f534c3e83",
+      "timestamp": "2025-09-17T20:01:05.369385",
+      "response_data": {
+        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYTkyMGFiMGEtMGJkMS00ZjZkLTg1NzktZTM2ZjUzNGMzZTgzIiwic3Vic2NyaXB0aW9uX3RpZXIiOiJmcmVlIiwiZXhwIjoxNzU4MjI1NjY1fQ.CvIWabuBeqGR1fLZBmGLe6udGjoTMu_qGbP8YhsrVZw",
+        "token_type": "bearer",
+        "user_id": "a920ab0a-0bd1-4f6d-8579-e36f534c3e83",
+        "subscription_tier": "free"
+      }
+    },
+    {
+      "test": "Duplicate Registration Prevention",
+      "success": true,
+      "details": "Correctly prevented duplicate registration",
+      "timestamp": "2025-09-17T20:01:05.423754",
+      "response_data": null
+    },
+    {
+      "test": "User Login",
+      "success": true,
+      "details": "Login successful for user: a920ab0a-0bd1-4f6d-8579-e36f534c3e83",
+      "timestamp": "2025-09-17T20:01:05.713795",
+      "response_data": {
+        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiYTkyMGFiMGEtMGJkMS00ZjZkLTg1NzktZTM2ZjUzNGMzZTgzIiwic3Vic2NyaXB0aW9uX3RpZXIiOiJmcmVlIiwiZXhwIjoxNzU4MjI1NjY1fQ.CvIWabuBeqGR1fLZBmGLe6udGjoTMu_qGbP8YhsrVZw",
+        "token_type": "bearer",
+        "user_id": "a920ab0a-0bd1-4f6d-8579-e36f534c3e83",
+        "subscription_tier": "free"
+      }
+    },
+    {
+      "test": "Invalid Login Prevention",
+      "success": true,
+      "details": "Correctly rejected invalid credentials",
+      "timestamp": "2025-09-17T20:01:05.772187",
+      "response_data": null
+    },
+    {
+      "test": "User Profile",
+      "success": true,
+      "details": "Profile retrieved for user: testuser_272a34b3@example.com",
+      "timestamp": "2025-09-17T20:01:05.823672",
+      "response_data": {
+        "id": "a920ab0a-0bd1-4f6d-8579-e36f534c3e83",
+        "email": "testuser_272a34b3@example.com",
+        "subscription_tier": "free",
+        "subscription_expires_at": null,
+        "created_at": "2025-09-17T20:01:05.341000"
+      }
+    },
+    {
+      "test": "Profile Without Auth",
+      "success": true,
+      "details": "Correctly rejected unauthenticated request",
+      "timestamp": "2025-09-17T20:01:05.874878",
+      "response_data": null
+    },
+    {
+      "test": "Get Proxies",
+      "success": true,
+      "details": "Retrieved 2 free proxies correctly",
+      "timestamp": "2025-09-17T20:01:05.931671",
+      "response_data": {
+        "proxy_count": 2
+      }
+    },
+    {
+      "test": "Get Specific Proxy",
+      "success": true,
+      "details": "Retrieved proxy: Turkey - Istanbul",
+      "timestamp": "2025-09-17T20:01:05.990511",
+      "response_data": {
+        "id": "d65cebb4-aa31-4070-9d48-f6a590f487f6",
+        "name": "Turkey - Istanbul",
+        "country": "Turkey",
+        "country_code": "TR",
+        "city": "Istanbul",
+        "proxy_type": "https",
+        "host": "tr-istanbul.nvpn.com",
+        "port": 443,
+        "is_premium": false,
+        "is_online": true,
+        "load_percentage": 45,
+        "ping_ms": 25,
+        "created_at": "2025-09-17T19:54:24.826000"
+      }
+    },
+    {
+      "test": "Proxies Without Auth",
+      "success": true,
+      "details": "Correctly rejected unauthenticated request",
+      "timestamp": "2025-09-17T20:01:06.041384",
+      "response_data": null
+    },
+    {
+      "test": "Subscription Upgrade",
+      "success": true,
+      "details": "Subscription upgraded successfully",
+      "timestamp": "2025-09-17T20:01:06.091023",
+      "response_data": {
+        "message": "Subscription upgraded successfully"
+      }
+    },
+    {
+      "test": "RevenueCat Webhook",
+      "success": true,
+      "details": "Webhook processed successfully",
+      "timestamp": "2025-09-17T20:01:06.137603",
+      "response_data": {
+        "status": "success"
+      }
+    }
+  ]
+}
