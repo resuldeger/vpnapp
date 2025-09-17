@@ -15,12 +15,14 @@ interface AuthState {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
+  isGuest: boolean;
   isLoading: boolean;
   register: (email: string, password: string) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   loadUser: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  continueAsGuest: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
