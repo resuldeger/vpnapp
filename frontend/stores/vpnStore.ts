@@ -74,7 +74,15 @@ export const useVPNStore = create<VPNState>((set, get) => ({
     try {
       set({ isLoadingServers: true });
       
-      const response = await axios.get(`${API_BASE_URL}/proxies`);
+      // Try guest endpoint first (no auth required), then fall back to authenticated endpoint
+      let response;
+      try {
+        response = await axios.get(`${API_BASE_URL}/proxies/guest`);
+      } catch (error) {
+        // If guest endpoint fails, try authenticated endpoint
+        response = await axios.get(`${API_BASE_URL}/proxies`);
+      }
+      
       const servers = response.data;
       
       set({ 
