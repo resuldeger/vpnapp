@@ -352,6 +352,18 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
   },
+  guestButton: {
+    backgroundColor: 'transparent',
+    paddingVertical: 12,
+    borderRadius: 25,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  guestButtonText: {
+    color: '#95A5A6',
+    fontSize: 16,
+    fontWeight: '500',
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
