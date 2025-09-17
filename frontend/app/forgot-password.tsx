@@ -16,28 +16,89 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { useAuthStore } from '../stores/authStore';
+import axios from 'axios';
 
-export default function LoginScreen() {
+const API_BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL + '/api';
+
+export default function ForgotPasswordScreen() {
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const { login, isLoading } = useAuthStore();
+  const [isLoading, setIsLoading] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
-  const handleLogin = async () => {
-    if (!email || !password) {
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleResetPassword = async () => {
+    if (!email) {
       Alert.alert(t('common.error'), t('auth.fillAllFields'));
       return;
     }
 
+    if (!validateEmail(email)) {
+      Alert.alert(t('common.error'), t('auth.invalidEmail'));
+      return;
+    }
+
     try {
-      await login(email, password);
-      router.replace('/');
+      setIsLoading(true);
+      
+      const response = await axios.post(`${API_BASE_URL}/auth/forgot-password`, {
+        email,
+      });
+
+      setResetSent(true);
+      Alert.alert(
+        t('common.success'),
+        t('auth.resetLinkSent'),
+        [{ text: t('common.ok') }]
+      );
     } catch (error: any) {
-      Alert.alert(t('auth.loginFailed'), error.message);
+      Alert.alert(t('common.error'), error.response?.data?.detail || 'Reset failed');
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  if (resetSent) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="light-content" backgroundColor="#1A1A2E" />
+        
+        <View style={styles.successContainer}>
+          {/* Header */}
+          <View style={styles.header}>
+            <TouchableOpacity 
+              style={styles.backButton}
+              onPress={() => router.back()}
+            >
+              <Ionicons name="arrow-back" size={24} color="#4ECDC4" />
+            </TouchableOpacity>
+            <Text style={styles.headerTitle}>{t('auth.resetPassword')}</Text>
+            <View style={styles.placeholder} />
+          </View>
+
+          {/* Success Content */}
+          <View style={styles.successContent}>
+            <View style={styles.successIcon}>
+              <Ionicons name="mail-outline" size={80} color="#4ECDC4" />
+            </View>
+            <Text style={styles.successTitle}>{t('common.success')}</Text>
+            <Text style={styles.successMessage}>{t('auth.resetLinkSent')}</Text>
+            
+            <TouchableOpacity 
+              style={styles.backToLoginButton}
+              onPress={() => router.replace('/login')}
+            >
+              <Text style={styles.backToLoginButtonText}>{t('auth.backToLogin')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -59,17 +120,17 @@ export default function LoginScreen() {
             >
               <Ionicons name="arrow-back" size={24} color="#4ECDC4" />
             </TouchableOpacity>
-            <Text style={styles.headerTitle}>{t('auth.login')}</Text>
+            <Text style={styles.headerTitle}>{t('auth.resetPassword')}</Text>
             <View style={styles.placeholder} />
           </View>
 
           {/* Logo */}
           <View style={styles.logoContainer}>
             <View style={styles.logo}>
-              <Ionicons name="shield-checkmark" size={50} color="#4ECDC4" />
+              <Ionicons name="key-outline" size={50} color="#4ECDC4" />
             </View>
-            <Text style={styles.welcomeText}>{t('auth.welcomeBack')}</Text>
-            <Text style={styles.subtitleText}>{t('auth.loginSubtitle')}</Text>
+            <Text style={styles.welcomeText}>{t('auth.resetPassword')}</Text>
+            <Text style={styles.subtitleText}>{t('auth.resetPasswordSubtitle')}</Text>
           </View>
 
           {/* Form */}
@@ -85,58 +146,27 @@ export default function LoginScreen() {
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoCorrect={false}
+                editable={!isLoading}
               />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Ionicons name="lock-closed-outline" size={20} color="#95A5A6" style={styles.inputIcon} />
-              <TextInput
-                style={styles.input}
-                placeholder={t('auth.password')}
-                placeholderTextColor="#95A5A6"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-              <TouchableOpacity 
-                style={styles.eyeButton}
-                onPress={() => setShowPassword(!showPassword)}
-              >
-                <Ionicons 
-                  name={showPassword ? "eye-outline" : "eye-off-outline"} 
-                  size={20} 
-                  color="#95A5A6" 
-                />
-              </TouchableOpacity>
             </View>
 
             <TouchableOpacity 
-              style={styles.loginButton}
-              onPress={handleLogin}
+              style={[styles.resetButton, isLoading && styles.resetButtonDisabled]}
+              onPress={handleResetPassword}
               disabled={isLoading}
             >
               {isLoading ? (
                 <ActivityIndicator color="#FFFFFF" />
               ) : (
-                <Text style={styles.loginButtonText}>{t('auth.login')}</Text>
+                <Text style={styles.resetButtonText}>{t('auth.sendResetLink')}</Text>
               )}
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={styles.forgotPasswordButton}
-              onPress={() => router.push('/forgot-password')}
-            >
-              <Text style={styles.forgotPasswordText}>{t('auth.forgotPassword')}</Text>
             </TouchableOpacity>
           </View>
 
           {/* Footer */}
           <View style={styles.footer}>
-            <Text style={styles.footerText}>{t('auth.noAccount')} </Text>
-            <TouchableOpacity onPress={() => router.push('/register')}>
-              <Text style={styles.footerLink}>{t('auth.register')}</Text>
+            <TouchableOpacity onPress={() => router.back()}>
+              <Text style={styles.footerLink}>{t('auth.backToLogin')}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -162,7 +192,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingTop: 20,
-    paddingBottom: 40,
+    paddingBottom: 30,
   },
   backButton: {
     padding: 8,
@@ -177,7 +207,7 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: 50,
+    marginBottom: 40,
   },
   logo: {
     width: 100,
@@ -193,10 +223,14 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: 'bold',
     marginBottom: 8,
+    textAlign: 'center',
   },
   subtitleText: {
     fontSize: 16,
     color: '#95A5A6',
+    textAlign: 'center',
+    lineHeight: 22,
+    paddingHorizontal: 20,
   },
   form: {
     marginBottom: 40,
@@ -206,7 +240,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 15,
-    marginBottom: 20,
+    marginBottom: 25,
     paddingHorizontal: 15,
     height: 55,
   },
@@ -218,48 +252,78 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
   },
-  eyeButton: {
-    padding: 5,
-  },
-  loginButton: {
+  resetButton: {
     backgroundColor: '#4ECDC4',
     paddingVertical: 16,
     borderRadius: 15,
     alignItems: 'center',
-    marginTop: 10,
     shadowColor: '#4ECDC4',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
   },
-  loginButtonText: {
+  resetButtonDisabled: {
+    backgroundColor: '#95A5A6',
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  resetButtonText: {
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: '600',
   },
-  forgotPasswordButton: {
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  forgotPasswordText: {
-    color: '#4ECDC4',
-    fontSize: 14,
-  },
   footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
     marginTop: 'auto',
     paddingBottom: 30,
   },
-  footerText: {
-    color: '#95A5A6',
-    fontSize: 14,
-  },
   footerLink: {
     color: '#4ECDC4',
-    fontSize: 14,
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  successContainer: {
+    flex: 1,
+  },
+  successContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 30,
+  },
+  successIcon: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: 'rgba(78, 205, 196, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  successTitle: {
+    fontSize: 28,
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    marginBottom: 15,
+  },
+  successMessage: {
+    fontSize: 16,
+    color: '#95A5A6',
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 40,
+    paddingHorizontal: 20,
+  },
+  backToLoginButton: {
+    backgroundColor: '#4ECDC4',
+    paddingHorizontal: 30,
+    paddingVertical: 15,
+    borderRadius: 25,
+  },
+  backToLoginButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
     fontWeight: '600',
   },
 });
