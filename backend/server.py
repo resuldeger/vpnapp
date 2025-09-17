@@ -191,6 +191,25 @@ async def get_profile(current_user: User = Depends(get_current_user)):
         created_at=current_user.created_at
     )
 
+@api_router.post("/auth/forgot-password")
+async def forgot_password(reset_request: PasswordResetRequest):
+    """Send password reset email (simulated)"""
+    # Check if user exists
+    user = await db.users.find_one({"email": reset_request.email})
+    if not user:
+        # For security, don't reveal if email exists or not
+        return {"message": "If this email is registered, you will receive a password reset link."}
+    
+    # In production, you would:
+    # 1. Generate a secure reset token
+    # 2. Store it in database with expiration
+    # 3. Send email with reset link
+    
+    # For now, simulate sending email
+    logger.info(f"Password reset requested for: {reset_request.email}")
+    
+    return {"message": "If this email is registered, you will receive a password reset link."}
+
 # Proxy Routes
 @api_router.get("/proxies", response_model=List[ProxyServer])
 async def get_proxies(current_user: Optional[User] = Depends(get_current_user)):
