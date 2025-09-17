@@ -34,6 +34,13 @@ export default function HomeScreen() {
   const [showStats, setShowStats] = useState(false);
 
   useEffect(() => {
+    if (isGuest) {
+      // Fetch servers for guest users
+      fetchServers();
+    }
+  }, [isGuest]);
+
+  useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isConnected) {
       interval = setInterval(() => {
