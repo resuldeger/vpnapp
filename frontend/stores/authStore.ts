@@ -29,7 +29,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   token: null,
   isAuthenticated: false,
+  isGuest: false,
   isLoading: false,
+
+  continueAsGuest: () => {
+    set({
+      isGuest: true,
+      isAuthenticated: false,
+      user: null,
+      token: null,
+      isLoading: false,
+    });
+  },
 
   register: async (email: string, password: string) => {
     try {
