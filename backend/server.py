@@ -190,13 +190,21 @@ async def get_profile(current_user: User = Depends(get_current_user)):
 
 # Proxy Routes
 @api_router.get("/proxies", response_model=List[ProxyServer])
-async def get_proxies(current_user: User = Depends(get_current_user)):
+async def get_proxies(current_user: Optional[User] = Depends(get_current_user)):
     query = {}
     
-    # Free users can only see free proxies
-    if current_user.subscription_tier == SubscriptionTier.FREE:
+    # Guest users (no authentication) can only see free proxies
+    if current_user is None or current_user.subscription_tier == SubscriptionTier.FREE:
         query["is_premium"] = False
     
+    proxies = await db.proxy_servers.find(query).to_list(1000)
+    return [ProxyServer(**proxy) for proxy in proxies]
+
+# Guest/Anonymous Routes
+@api_router.get("/proxies/guest", response_model=List[ProxyServer])
+async def get_guest_proxies():
+    """Get free proxies for guest users without authentication"""
+    query = {"is_premium": False}
     proxies = await db.proxy_servers.find(query).to_list(1000)
     return [ProxyServer(**proxy) for proxy in proxies]
 
