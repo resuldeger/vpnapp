@@ -106,7 +106,7 @@ export default function HomeScreen() {
     }
   };
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated && !isGuest) {
     return (
       <SafeAreaView style={styles.container}>
         <StatusBar barStyle="light-content" backgroundColor="#1A1A2E" />
@@ -132,6 +132,13 @@ export default function HomeScreen() {
               onPress={() => router.push('/register')}
             >
               <Text style={styles.secondaryButtonText}>Kayıt Ol</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.guestButton}
+              onPress={continueAsGuest}
+            >
+              <Text style={styles.guestButtonText}>Misafir Olarak Devam Et</Text>
             </TouchableOpacity>
           </View>
         </View>
