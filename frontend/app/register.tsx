@@ -12,12 +12,16 @@ import {
   Platform,
   ScrollView,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
+import * as WebBrowser from 'expo-web-browser';
 import { useAuthStore } from '../stores/authStore';
 
 export default function RegisterScreen() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -33,39 +37,61 @@ export default function RegisterScreen() {
 
   const handleRegister = async () => {
     if (!email || !password || !confirmPassword) {
-      Alert.alert('Hata', 'Lütfen tüm alanları doldurun');
+      Alert.alert(t('common.error'), t('auth.fillAllFields'));
       return;
     }
 
     if (!validateEmail(email)) {
-      Alert.alert('Hata', 'Geçerli bir e-posta adresi girin');
+      Alert.alert(t('common.error'), t('auth.invalidEmail'));
       return;
     }
 
     if (password.length < 6) {
-      Alert.alert('Hata', 'Şifre en az 6 karakter olmalıdır');
+      Alert.alert(t('common.error'), t('auth.passwordMinLength'));
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert('Hata', 'Şifreler eşleşmiyor');
+      Alert.alert(t('common.error'), t('auth.passwordsNotMatch'));
       return;
     }
 
     if (!acceptTerms) {
-      Alert.alert('Hata', 'Kullanım koşullarını kabul etmelisiniz');
+      Alert.alert(t('common.error'), t('auth.acceptTerms'));
       return;
     }
 
     try {
       await register(email, password);
       Alert.alert(
-        'Başarılı',
-        'Hesabınız oluşturuldu! Hoş geldiniz.',
-        [{ text: 'Tamam', onPress: () => router.replace('/') }]
+        t('common.success'),
+        t('auth.accountCreated'),
+        [{ text: t('common.ok'), onPress: () => router.replace('/') }]
       );
     } catch (error: any) {
-      Alert.alert('Kayıt Hatası', error.message);
+      Alert.alert(t('auth.registerFailed'), error.message);
+    }
+  };
+
+  const openTermsOfService = async () => {
+    try {
+      await WebBrowser.openBrowserAsync('https://securevpn.com/terms', {
+        presentationStyle: WebBrowser.WebBrowserPresentationStyle.FORM_SHEET,
+        controlsColor: '#4ECDC4',
+      });
+    } catch (error) {
+      console.error('Error opening terms:', error);
+    }
+  };
+
+  const openPrivacyPolicy = async () => {
+    try {
+      await WebBrowser.openBrowserAsync('https://securevpn.com/privacy', {
+        presentationStyle: WebBrowser.WebBrowserPresentationStyle.FORM_SHEET,
+        controlsColor: '#4ECDC4',
+      });
+    } catch (error) {
+      console.error('Error opening privacy policy:', error);
     }
   };
 
@@ -89,7 +115,7 @@ export default function RegisterScreen() {
             >
               <Ionicons name="arrow-back" size={24} color="#4ECDC4" />
             </TouchableOpacity>
-            <Text style={styles.headerTitle}>Kayıt Ol</Text>
+            <Text style={styles.headerTitle}>{t('auth.register')}</Text>
             <View style={styles.placeholder} />
           </View>
 
@@ -98,8 +124,8 @@ export default function RegisterScreen() {
             <View style={styles.logo}>
               <Ionicons name="shield-checkmark" size={50} color="#4ECDC4" />
             </View>
-            <Text style={styles.welcomeText}>Hoş Geldiniz!</Text>
-            <Text style={styles.subtitleText}>Güvenli VPN deneyiminiz başlasın</Text>
+            <Text style={styles.welcomeText}>{t('auth.welcome')}</Text>
+            <Text style={styles.subtitleText}>{t('auth.registerSubtitle')}</Text>
           </View>
 
           {/* Form */}
@@ -108,7 +134,7 @@ export default function RegisterScreen() {
               <Ionicons name="mail-outline" size={20} color="#95A5A6" style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
-                placeholder="E-posta adresiniz"
+                placeholder={t('auth.email')}
                 placeholderTextColor="#95A5A6"
                 value={email}
                 onChangeText={setEmail}
@@ -122,7 +148,7 @@ export default function RegisterScreen() {
               <Ionicons name="lock-closed-outline" size={20} color="#95A5A6" style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
-                placeholder="Şifreniz (en az 6 karakter)"
+                placeholder={t('auth.password') + ' (en az 6 karakter)'}
                 placeholderTextColor="#95A5A6"
                 value={password}
                 onChangeText={setPassword}
@@ -146,7 +172,7 @@ export default function RegisterScreen() {
               <Ionicons name="lock-closed-outline" size={20} color="#95A5A6" style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
-                placeholder="Şifrenizi tekrar girin"
+                placeholder={t('auth.confirmPassword')}
                 placeholderTextColor="#95A5A6"
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
@@ -175,8 +201,14 @@ export default function RegisterScreen() {
                 {acceptTerms && <Ionicons name="checkmark" size={16} color="#FFFFFF" />}
               </View>
               <Text style={styles.termsText}>
-                <Text style={styles.termsLink}>Kullanım Koşulları</Text>'nı ve{' '}
-                <Text style={styles.termsLink}>Gizlilik Politikası</Text>'nı okudum, kabul ediyorum
+                <TouchableOpacity onPress={openTermsOfService}>
+                  <Text style={styles.termsLink}>{t('auth.termsOfService')}</Text>
+                </TouchableOpacity>
+                <Text> ve </Text>
+                <TouchableOpacity onPress={openPrivacyPolicy}>
+                  <Text style={styles.termsLink}>{t('auth.privacyPolicy')}</Text>
+                </TouchableOpacity>
+                <Text> okudum, kabul ediyorum</Text>
               </Text>
             </TouchableOpacity>
 
@@ -195,9 +227,9 @@ export default function RegisterScreen() {
 
           {/* Footer */}
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Zaten hesabınız var mı? </Text>
+            <Text style={styles.footerText}>{t('auth.alreadyHaveAccount')} </Text>
             <TouchableOpacity onPress={() => router.push('/login')}>
-              <Text style={styles.footerLink}>Giriş Yapın</Text>
+              <Text style={styles.footerLink}>{t('auth.login')}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -312,6 +344,7 @@ const styles = StyleSheet.create({
   },
   termsLink: {
     color: '#4ECDC4',
+    textDecorationLine: 'underline',
   },
   registerButton: {
     backgroundColor: '#4ECDC4',

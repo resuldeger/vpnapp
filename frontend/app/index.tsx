@@ -14,12 +14,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../stores/authStore';
 import { useVPNStore } from '../stores/vpnStore';
 
 const { width, height } = Dimensions.get('window');
 
 export default function HomeScreen() {
+  const { t } = useTranslation();
   const { user, isAuthenticated, isGuest, continueAsGuest } = useAuthStore();
   const { 
     isConnected, 
@@ -60,11 +62,11 @@ export default function HomeScreen() {
     } else {
       if (!selectedServer) {
         Alert.alert(
-          "Sunucu Seçin",
-          "Lütfen önce bir sunucu seçin",
+          t('home.selectServer'),
+          t('home.selectServerMessage'),
           [
-            { text: "İptal", style: "cancel" },
-            { text: "Sunucu Seç", onPress: () => router.push('/servers') }
+            { text: t('common.cancel'), style: "cancel" },
+            { text: t('servers.title'), onPress: () => router.push('/servers') }
           ]
         );
         return;
@@ -94,16 +96,7 @@ export default function HomeScreen() {
   };
 
   const getConnectionStatusText = () => {
-    switch (connectionStatus) {
-      case 'connected':
-        return 'Bağlandı';
-      case 'connecting':
-        return 'Bağlanıyor...';
-      case 'disconnecting':
-        return 'Bağlantı kesiliyor...';
-      default:
-        return 'Bağlantı yok';
-    }
+    return t(`home.connectionStatus.${connectionStatus}`);
   };
 
   if (!isAuthenticated && !isGuest) {
@@ -115,8 +108,8 @@ export default function HomeScreen() {
             <View style={styles.logo}>
               <Ionicons name="shield-checkmark" size={60} color="#4ECDC4" />
             </View>
-            <Text style={styles.logoText}>SecureVPN</Text>
-            <Text style={styles.tagline}>Güvenli ve hızlı internet erişimi</Text>
+            <Text style={styles.logoText}>{t('app.name')}</Text>
+            <Text style={styles.tagline}>{t('app.tagline')}</Text>
           </View>
 
           <View style={styles.authButtons}>
@@ -124,21 +117,21 @@ export default function HomeScreen() {
               style={styles.primaryButton}
               onPress={() => router.push('/login')}
             >
-              <Text style={styles.primaryButtonText}>Giriş Yap</Text>
+              <Text style={styles.primaryButtonText}>{t('auth.login')}</Text>
             </TouchableOpacity>
             
             <TouchableOpacity 
               style={styles.secondaryButton}
               onPress={() => router.push('/register')}
             >
-              <Text style={styles.secondaryButtonText}>Kayıt Ol</Text>
+              <Text style={styles.secondaryButtonText}>{t('auth.register')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
               style={styles.guestButton}
               onPress={continueAsGuest}
             >
-              <Text style={styles.guestButtonText}>Misafir Olarak Devam Et</Text>
+              <Text style={styles.guestButtonText}>{t('auth.continueAsGuest')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -154,8 +147,8 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <Text style={styles.greeting}>
           {isGuest 
-            ? 'Misafir Kullanıcı' 
-            : `Merhaba, ${user?.email?.split('@')[0] || 'Kullanıcı'}`
+            ? t('auth.guestUser')
+            : t('home.greeting', { name: user?.email?.split('@')[0] || 'User' })
           }
         </Text>
         <TouchableOpacity 
@@ -196,7 +189,7 @@ export default function HomeScreen() {
                 onPress={() => setShowStats(!showStats)}
               >
                 <Ionicons name="bar-chart-outline" size={16} color="#4ECDC4" />
-                <Text style={styles.statsButtonText}>İstatistikler</Text>
+                <Text style={styles.statsButtonText}>{t('home.statistics')}</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -218,7 +211,7 @@ export default function HomeScreen() {
               color="#FFFFFF" 
             />
             <Text style={styles.connectionButtonText}>
-              {isConnected ? 'Bağlantıyı Kes' : 'Bağlan'}
+              {isConnected ? t('home.disconnect') : t('home.connect')}
             </Text>
           </View>
         </TouchableOpacity>
@@ -230,7 +223,7 @@ export default function HomeScreen() {
             onPress={() => router.push('/servers')}
           >
             <Ionicons name="server-outline" size={24} color="#4ECDC4" />
-            <Text style={styles.actionButtonText}>Sunucular</Text>
+            <Text style={styles.actionButtonText}>{t('servers.title')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
@@ -238,7 +231,7 @@ export default function HomeScreen() {
             onPress={() => router.push('/settings')}
           >
             <Ionicons name="settings-outline" size={24} color="#4ECDC4" />
-            <Text style={styles.actionButtonText}>Ayarlar</Text>
+            <Text style={styles.actionButtonText}>{t('settings.title')}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity 
@@ -246,7 +239,7 @@ export default function HomeScreen() {
             onPress={() => router.push('/subscription')}
           >
             <Ionicons name="diamond-outline" size={24} color="#FFD93D" />
-            <Text style={styles.actionButtonText}>Premium</Text>
+            <Text style={styles.actionButtonText}>{t('servers.premium')}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -255,24 +248,24 @@ export default function HomeScreen() {
       {showStats && isConnected && (
         <BlurView intensity={80} style={styles.statsModal}>
           <View style={styles.statsContent}>
-            <Text style={styles.statsTitle}>Bağlantı İstatistikleri</Text>
+            <Text style={styles.statsTitle}>{t('home.connectionStats')}</Text>
             
             <View style={styles.statsGrid}>
               <View style={styles.statItem}>
                 <Text style={styles.statValue}>↓ 45.2 MB</Text>
-                <Text style={styles.statLabel}>İndirilen</Text>
+                <Text style={styles.statLabel}>{t('home.downloaded')}</Text>
               </View>
               <View style={styles.statItem}>
                 <Text style={styles.statValue}>↑ 12.8 MB</Text>
-                <Text style={styles.statLabel}>Yüklenen</Text>
+                <Text style={styles.statLabel}>{t('home.uploaded')}</Text>
               </View>
               <View style={styles.statItem}>
                 <Text style={styles.statValue}>{selectedServer?.ping_ms || 0} ms</Text>
-                <Text style={styles.statLabel}>Ping</Text>
+                <Text style={styles.statLabel}>{t('home.ping')}</Text>
               </View>
               <View style={styles.statItem}>
                 <Text style={styles.statValue}>{selectedServer?.load_percentage || 0}%</Text>
-                <Text style={styles.statLabel}>Sunucu Yükü</Text>
+                <Text style={styles.statLabel}>{t('home.serverLoad')}</Text>
               </View>
             </View>
 
@@ -280,7 +273,7 @@ export default function HomeScreen() {
               style={styles.closeStatsButton}
               onPress={() => setShowStats(false)}
             >
-              <Text style={styles.closeStatsButtonText}>Kapat</Text>
+              <Text style={styles.closeStatsButtonText}>{t('common.close')}</Text>
             </TouchableOpacity>
           </View>
         </BlurView>
