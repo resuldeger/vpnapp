@@ -20,13 +20,14 @@ import { useVPNStore } from '../stores/vpnStore';
 const { width, height } = Dimensions.get('window');
 
 export default function HomeScreen() {
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated, isGuest, continueAsGuest } = useAuthStore();
   const { 
     isConnected, 
     selectedServer, 
     connectionStatus,
     connect,
-    disconnect 
+    disconnect,
+    fetchServers
   } = useVPNStore();
 
   const [connectionTime, setConnectionTime] = useState(0);
