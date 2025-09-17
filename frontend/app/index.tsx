@@ -153,13 +153,20 @@ export default function HomeScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.greeting}>
-          Merhaba, {user?.email?.split('@')[0] || 'Kullanıcı'}
+          {isGuest 
+            ? 'Misafir Kullanıcı' 
+            : `Merhaba, ${user?.email?.split('@')[0] || 'Kullanıcı'}`
+          }
         </Text>
         <TouchableOpacity 
           style={styles.profileButton}
-          onPress={() => router.push('/profile')}
+          onPress={() => isGuest ? router.push('/login') : router.push('/profile')}
         >
-          <Ionicons name="person-circle-outline" size={28} color="#4ECDC4" />
+          <Ionicons 
+            name={isGuest ? "log-in-outline" : "person-circle-outline"} 
+            size={28} 
+            color="#4ECDC4" 
+          />
         </TouchableOpacity>
       </View>
 
