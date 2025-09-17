@@ -231,10 +231,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "User Authentication API (register/login)"
-    - "Proxy Servers API"
     - "Authentication Screens (Login/Register)"
     - "Main VPN Dashboard"
+    - "Server Selection Screen"
+    - "State Management (Auth & VPN)"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
